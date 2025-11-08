@@ -1,0 +1,10 @@
+{
+  "name": "vrack2-other-rtu",
+  "version": "0.0.1",
+  "description": "Набор устройств для разных ModBusRTU устройств",
+  "main": "index.js",
+  "author": "Boris Bobylev",
+  "devDependencies": {
+    "@types/node": "^24.9.1"
+  }
+}
