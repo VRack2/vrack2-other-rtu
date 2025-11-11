@@ -87,8 +87,8 @@ class Waveshare8D extends DeviceRTU_1.default {
     update() {
         return __awaiter(this, void 0, void 0, function* () {
             this.ports.output.status.push(this.shares.online);
-            yield this.updateStatus(0x02, 0x04, 'inputMask', 'di');
-            yield this.updateStatus(0x01, 0x04, 'outputMask', 'do');
+            yield this.updateStatus(0x02, 0x08, 'inputMask', 'di');
+            yield this.updateStatus(0x01, 0x08, 'outputMask', 'do');
             yield this.writeOutput();
             this.ports.output.status.push(this.shares.online);
         });
@@ -119,21 +119,19 @@ class Waveshare8D extends DeviceRTU_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.shares.writeMask === this.shares.outputMask)
                 return;
-            this.simpleRequest(0x0F, 0x00, 0x04, this.n2ba(this.shares.writeMask));
+            yield this.simpleRequest(0x0F, 0x00, 0x08, this.n2ba(this.shares.writeMask));
         });
     }
     /**
      * Преобразует число в массив бит
     */
     n2ba(n) {
-        if (n === 0)
-            return [0];
+        n &= 0xFF; // гарантируем 8-битное значение
         const bits = [];
-        while (n) {
-            bits.push(n & 1);
-            n >>>= 1;
+        for (let i = 0; i < 8; i++) {
+            bits.push((n >> i) & 1); // i-й бит (начиная с 0 — младшего)
         }
-        return bits.reverse();
+        return bits;
     }
 }
 exports.default = Waveshare8D;

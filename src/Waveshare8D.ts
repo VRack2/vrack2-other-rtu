@@ -87,8 +87,8 @@ export default class Waveshare8D extends DeviceRTU {
   */
   async update() {
     this.ports.output.status.push(this.shares.online)
-    await this.updateStatus(0x02, 0x04, 'inputMask', 'di')
-    await this.updateStatus(0x01, 0x04, 'outputMask', 'do')
+    await this.updateStatus(0x02, 0x08, 'inputMask', 'di')
+    await this.updateStatus(0x01, 0x08, 'outputMask', 'do')
     await this.writeOutput()
     this.ports.output.status.push(this.shares.online)
   }
@@ -114,16 +114,18 @@ export default class Waveshare8D extends DeviceRTU {
   */
   async writeOutput() {
     if (this.shares.writeMask === this.shares.outputMask) return
-    this.simpleRequest(0x0F, 0x00, 0x04,this.n2ba(this.shares.writeMask))
+    await this.simpleRequest(0x0F, 0x00, 0x08, this.n2ba(this.shares.writeMask))
   }
 
   /**
    * Преобразует число в массив бит
   */
   private n2ba(n: number): number[] {
-    if (n === 0) return [0];
+    n &= 0xFF; // гарантируем 8-битное значение
     const bits: number[] = [];
-    while (n) { bits.push(n & 1); n >>>= 1; }
-    return bits.reverse();
+    for (let i = 0; i < 8; i++) {
+      bits.push((n >> i) & 1); // i-й бит (начиная с 0 — младшего)
+    }
+    return bits;
   }
 }
